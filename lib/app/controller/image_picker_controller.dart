@@ -13,18 +13,18 @@ class ImagePickerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _fetchNewMedia();
+    _fetchGallery();
   }
 
   handleScrollEvent(ScrollNotification scroll) {
     if (scroll.metrics.pixels / scroll.metrics.maxScrollExtent > 0.33) {
       if (currentPage != lastPage) {
-        _fetchNewMedia();
+        _fetchGallery();
       }
     }
   }
 
-  _fetchNewMedia() async {
+  _fetchGallery() async {
     lastPage = currentPage;
     var result = await PhotoManager.requestPermission();
     if (result) {
@@ -89,8 +89,7 @@ class ImagePickerController extends GetxController {
       mediaList.addAll(temp);
       currentPage++;
     } else {
-      // fail
-      /// if result is fail, you can call `PhotoManager.openSetting();`  to open android/ios applicaton's setting to get permission
+      /// user doesn't give permission 
     }
   }
 
@@ -99,7 +98,7 @@ class ImagePickerController extends GetxController {
       selectedAlbums = value;
       refreshed = true;
       currentPage = 0;
-      _fetchNewMedia();
+      _fetchGallery();
     };
   }
 
