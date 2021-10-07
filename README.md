@@ -1,16 +1,11 @@
-# flutter_twitter_image_picker
+# Flutter Twitter Image Picker Clone
 
-A new Flutter project.
 
-## Getting Started
+Building a Twitter Image Picker Clone in Flutter.
 
-This project is a starting point for a Flutter application.
+Show some ❤️ and star the repo to support the project
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p float="left">
+<img src="https://user-images.githubusercontent.com/35763779/136394621-5b4b4ea5-cace-4550-9b63-f10d113e94f6.jpg" width="220" height="440">
+<img src="https://user-images.githubusercontent.com/35763779/136394652-6ec92c27-3246-4d9c-b11a-9a7eab5a22ec.jpg" width="220" height="440">
+</p>
