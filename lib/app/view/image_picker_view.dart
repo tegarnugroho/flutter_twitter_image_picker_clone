@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 import 'dart:ui'; // Add this import for ImageFilter
+import 'dart:math'; // Add this for min function
 
 import 'package:flutter/material.dart';
 import 'package:flutter_twitter_image_picker/app/controller/image_picker_controller.dart';
 import 'package:get/get.dart';
+import 'package:image/image.dart' as img;
 
 class ImagePickerView extends StatelessWidget {
   final ImagePickerController imagePickerController =
@@ -18,65 +20,93 @@ class ImagePickerView extends StatelessWidget {
         showDialog(
           context: context,
           barrierDismissible: true, // Allow dismissing by tapping outside
-          builder: (context) => BackdropFilter(
-            filter:
-                ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Blur the background
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              insetPadding: EdgeInsets.all(20), // Padding from screen edges
-              child: Stack(
-                children: [
-                  // Enhanced preview container
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.9,
-                      maxHeight: MediaQuery.of(context).size.height * 0.8,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          blurRadius: 20,
-                          offset: Offset(0, 10),
+          builder: (context) {
+            final decoded = img.decodeImage(data);
+            double imgWidth = decoded?.width.toDouble() ?? 0;
+            double imgHeight = decoded?.height.toDouble() ?? 0;
+
+            // Calculate container size, maintaining aspect ratio and capping at screen
+            double screenWidth = MediaQuery.of(context).size.width;
+            double screenHeight = MediaQuery.of(context).size.height;
+            double maxW = screenWidth * 0.9;
+            double maxH = screenHeight * 0.8;
+
+            double containerWidth;
+            double containerHeight;
+
+            if (imgWidth > maxW || imgHeight > maxH) {
+              double scale = min(maxW / imgWidth, maxH / imgHeight);
+              containerWidth = imgWidth * scale;
+              containerHeight = imgHeight * scale;
+            } else {
+              containerWidth = imgWidth;
+              containerHeight = imgHeight;
+            }
+
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Blur the background
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: EdgeInsets.all(20), // Padding from screen edges
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: Stack(
+                  children: [
+                    // Enhanced preview container
+                    Container(
+                      width: containerWidth,
+                      height: containerHeight,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            25), // Increased border radius for a more rounded look
+                        border: Border.all(
+                          color: Colors.white.withValues(
+                              alpha: 0.2), // Subtle white border for definition
+                          width: 1,
                         ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.memory(
-                        data,
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        height: double.infinity,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 20,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            25), // Match the container's border radius
+                        child: Image.memory(
+                          data,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
-                  ),
-                  // Close button
-                  Positioned(
-                    top: 50,
-                    right: 10,
-                    child: Material(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => Navigator.of(context).pop(),
-                        child: const Padding(
-                          padding: EdgeInsets.all(3), // ← controls circle size
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 18,
+                    // Close button
+                    Positioned(
+                      top: 50,
+                      right: 10,
+                      child: Material(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Padding(
+                            padding: EdgeInsets.all(3), // ← controls circle size
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       }
     };
