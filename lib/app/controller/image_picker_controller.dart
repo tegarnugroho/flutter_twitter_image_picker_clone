@@ -5,8 +5,8 @@ import 'package:photo_manager/photo_manager.dart';
 class ImagePickerController extends GetxController {
   var mediaList = <Widget>[].obs;
   var listAlbums = <AssetPathEntity>[].obs;
-  AssetPathEntity selectedAlbums;
-  int lastPage;
+  AssetPathEntity? selectedAlbums;
+  int? lastPage;
   int currentPage = 0;
   bool refreshed = false;
 
@@ -26,28 +26,29 @@ class ImagePickerController extends GetxController {
 
   _fetchGallery() async {
     lastPage = currentPage;
-    var result = await PhotoManager.requestPermission();
-    if (result) {
+    var result = await PhotoManager.requestPermissionExtend();
+    if (result.isAuth) {
       listAlbums.value = await PhotoManager.getAssetPathList(onlyAll: false);
       if (selectedAlbums == null) {
         selectedAlbums = listAlbums.first;
       }
       List<AssetEntity> media =
-          await selectedAlbums.getAssetListPaged(currentPage, 60);
+          await selectedAlbums!.getAssetListPaged(page: currentPage, size: 60);
       print(media);
       print(listAlbums.length);
       List<Widget> temp = [];
       for (var asset in media) {
         temp.add(
           FutureBuilder(
-            future: asset.thumbDataWithSize(200, 200),
+            future: asset.thumbnailDataWithOption(
+                ThumbnailOption(size: ThumbnailSize(200, 200))),
             builder: (BuildContext context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done)
                 return Stack(
                   children: <Widget>[
                     Positioned.fill(
                       child: Image.memory(
-                        snapshot.data,
+                        snapshot.data!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Text(
@@ -89,7 +90,7 @@ class ImagePickerController extends GetxController {
       mediaList.addAll(temp);
       currentPage++;
     } else {
-      /// user doesn't give permission 
+      /// user doesn't give permission
     }
   }
 

@@ -32,7 +32,6 @@ class ImagePickerView extends StatelessWidget {
           ),
         ),
         backgroundColor: Color(0XFF15202B),
-        brightness: Brightness.dark,
         elevation: 1,
         titleSpacing: 5,
         leading: IconButton(
@@ -51,7 +50,7 @@ class ImagePickerView extends StatelessWidget {
       body: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification scroll) {
           imagePickerController.handleScrollEvent(scroll);
-          return;
+          return true;
         },
         child: GridView.builder(
             itemCount: imagePickerController.mediaList.length,
