@@ -135,7 +135,7 @@ class ImagePickerView extends StatelessWidget {
             child: GridView.builder(
                 itemCount: imagePickerController.mediaList.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, mainAxisSpacing: 1, crossAxisSpacing: 1),
+                    crossAxisCount: 3, mainAxisSpacing: 3, crossAxisSpacing: 3),
                 itemBuilder: (BuildContext context, int index) {
                   return imagePickerController.mediaList[index];
                 }),
