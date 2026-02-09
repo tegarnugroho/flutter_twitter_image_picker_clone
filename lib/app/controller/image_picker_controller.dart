@@ -11,6 +11,8 @@ class ImagePickerController extends GetxController {
   int currentPage = 0;
   bool refreshed = false;
 
+  Function(Uint8List?)? onLongPressImage;
+
   @override
   void onInit() {
     super.onInit();
@@ -36,6 +38,7 @@ class ImagePickerController extends GetxController {
       selectedAlbums ??= listAlbums.first;
       List<AssetEntity> media =
           await selectedAlbums!.getAssetListPaged(page: currentPage, size: 60);
+      media = media.reversed.toList();
       if (kDebugMode) {
         print(media);
         print(listAlbums.length);
@@ -48,32 +51,35 @@ class ImagePickerController extends GetxController {
                 ThumbnailOption(size: ThumbnailSize(200, 200))),
             builder: (BuildContext context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
-                return Stack(
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: Image.memory(
-                        snapshot.data!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text(
-                            'error',
-                            style: TextStyle(color: Colors.white),
-                          );
-                        },
-                      ),
-                    ),
-                    if (asset.type == AssetType.video)
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 5, bottom: 5),
-                          child: Icon(
-                            Icons.videocam,
-                            color: Colors.white,
-                          ),
+                return GestureDetector(
+                  onLongPress: () => onLongPressImage?.call(snapshot.data),
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+                        child: Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Text(
+                              'error',
+                              style: TextStyle(color: Colors.white),
+                            );
+                          },
                         ),
                       ),
-                  ],
+                      if (asset.type == AssetType.video)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 5, bottom: 5),
+                            child: Icon(
+                              Icons.videocam,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 );
               }
               return Container();
