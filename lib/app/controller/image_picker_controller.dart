@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -29,13 +30,16 @@ class ImagePickerController extends GetxController {
     var result = await PhotoManager.requestPermissionExtend();
     if (result.isAuth) {
       listAlbums.value = await PhotoManager.getAssetPathList(onlyAll: false);
-      if (selectedAlbums == null) {
-        selectedAlbums = listAlbums.first;
+      if (listAlbums.isEmpty) {
+        return; // No albums available
       }
+      selectedAlbums ??= listAlbums.first;
       List<AssetEntity> media =
           await selectedAlbums!.getAssetListPaged(page: currentPage, size: 60);
-      print(media);
-      print(listAlbums.length);
+      if (kDebugMode) {
+        print(media);
+        print(listAlbums.length);
+      }
       List<Widget> temp = [];
       for (var asset in media) {
         temp.add(
@@ -43,7 +47,7 @@ class ImagePickerController extends GetxController {
             future: asset.thumbnailDataWithOption(
                 ThumbnailOption(size: ThumbnailSize(200, 200))),
             builder: (BuildContext context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done)
+              if (snapshot.connectionState == ConnectionState.done) {
                 return Stack(
                   children: <Widget>[
                     Positioned.fill(
@@ -71,6 +75,7 @@ class ImagePickerController extends GetxController {
                       ),
                   ],
                 );
+              }
               return Container();
             },
           ),
@@ -101,10 +106,5 @@ class ImagePickerController extends GetxController {
       currentPage = 0;
       _fetchGallery();
     };
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

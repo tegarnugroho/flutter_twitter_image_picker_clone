@@ -3,6 +3,8 @@ import 'package:flutter_twitter_image_picker/app/view/image_picker_view.dart';
 import 'package:get/route_manager.dart';
 
 class App extends StatelessWidget {
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
