@@ -6,6 +6,9 @@ A Flutter application that replicates Twitter's image picker interface, allowing
 
 - **Album Selection**: Browse through different photo albums on your device
 - **Grid View**: Display images and videos in a responsive 3-column grid
+- **Multiple Selection**: Tap images to select/deselect multiple items with visual feedback
+- **Selection Counter**: Shows the number of selected images in the app bar and header
+- **Clear Selection**: Option to clear all selected images at once
 - **Image Preview**: Long press any image to view it in a full-screen dialog with blur background
 - **Video Support**: Identifies and marks video files with an icon
 - **Infinite Scroll**: Automatically loads more media as you scroll
@@ -34,9 +37,48 @@ A Flutter application that replicates Twitter's image picker interface, allowing
 
 1. **Grant Permissions**: The app will request access to your photo library
 2. **Select Album**: Use the dropdown in the app bar to switch between different albums
-3. **Browse Media**: Scroll through your images and videos in the grid view
-4. **Preview Images**: Long press any image to see a larger preview
-5. **Close**: Tap the close button or outside the preview to dismiss
+3. **Select Images**: Tap images to select/deselect them (selected images show a blue overlay with checkmark)
+4. **View Selection Count**: The app bar shows "Done (X)" where X is the number of selected images
+5. **Clear Selection**: Use the "Clear All" button in the selection header to deselect all images
+6. **Confirm Selection**: Tap "Done" to confirm your selection and trigger the callback
+7. **Browse Media**: Scroll through your images and videos in the grid view
+8. **Preview Images**: Long press any image to see a larger preview
+9. **Close**: Tap the close button or outside the preview to dismiss
+
+### Integration Example
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_twitter_image_picker/main.dart';
+import 'package:photo_manager/photo_manager.dart';
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text('My App')),
+        body: Center(
+          child: ElevatedButton(
+            child: Text('Pick Images'),
+            onPressed: () {
+              TwitterImagePicker.show(
+                context: context,
+                onImagesSelected: (List<AssetEntity> selectedImages) {
+                  // Handle the selected images here
+                  print('Selected ${selectedImages.length} images');
+                  // You can now use the selected AssetEntity objects
+                  // to get image data, file paths, etc.
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
 
 ## Dependencies
 

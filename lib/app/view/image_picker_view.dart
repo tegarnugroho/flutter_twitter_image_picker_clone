@@ -6,15 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_twitter_image_picker/app/controller/image_picker_controller.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart' as img;
+import 'package:photo_manager/photo_manager.dart';
 
 class ImagePickerView extends StatelessWidget {
   final ImagePickerController imagePickerController =
       Get.put(ImagePickerController());
+  final Function(List<AssetEntity>)? onImagesSelected;
 
-  ImagePickerView({super.key});
+  ImagePickerView({super.key, this.onImagesSelected});
 
   @override
   Widget build(BuildContext context) {
+    // Set the callback
+    imagePickerController.onImagesSelected = onImagesSelected;
     imagePickerController.onLongPressImage = (Uint8List? data) {
       if (data != null) {
         showDialog(
@@ -44,7 +48,8 @@ class ImagePickerView extends StatelessWidget {
             }
 
             return BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Blur the background
+              filter: ImageFilter.blur(
+                  sigmaX: 10, sigmaY: 10), // Blur the background
               child: Dialog(
                 backgroundColor: Colors.transparent,
                 insetPadding: EdgeInsets.all(20), // Padding from screen edges
@@ -57,11 +62,11 @@ class ImagePickerView extends StatelessWidget {
                       width: containerWidth,
                       height: containerHeight,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                            25), // Increased border radius for a more rounded look
+                        // Increased border radius for a more rounded look
+                        borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: Colors.white.withValues(
-                              alpha: 0.2), // Subtle white border for definition
+                          // Subtle white border for definition
+                          color: Colors.white.withValues(alpha: 0.2),
                           width: 1,
                         ),
                         boxShadow: [
@@ -73,17 +78,17 @@ class ImagePickerView extends StatelessWidget {
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            25), // Match the container's border radius
+                        // Match the container's border radius
+                        borderRadius: BorderRadius.circular(15),
                         child: Image.memory(
                           data,
-                          fit: BoxFit.contain,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
                     // Close button
                     Positioned(
-                      top: 50,
+                      top: 10,
                       right: 10,
                       child: Material(
                         color: Colors.black.withValues(alpha: 0.5),
@@ -92,7 +97,8 @@ class ImagePickerView extends StatelessWidget {
                           customBorder: const CircleBorder(),
                           onTap: () => Navigator.of(context).pop(),
                           child: const Padding(
-                            padding: EdgeInsets.all(3), // ← controls circle size
+                            padding:
+                                EdgeInsets.all(3), // ← controls circle size
                             child: Icon(
                               Icons.close,
                               color: Colors.white,
@@ -149,11 +155,16 @@ class ImagePickerView extends StatelessWidget {
               icon: Icon(Icons.close, color: Color(0XFF00ACEE)),
             ),
             actions: [
-              Center(
-                  child: Text(
-                'Done',
-                style: TextStyle(color: Color(0XFF00ACEE)),
-              )),
+              GestureDetector(
+                onTap: () => imagePickerController.onDonePressed(),
+                child: Obx(() => Center(
+                        child: Text(
+                      imagePickerController.selectedImages.isNotEmpty
+                          ? 'Done (${imagePickerController.selectedImages.length})'
+                          : 'Done',
+                      style: TextStyle(color: Color(0XFF00ACEE)),
+                    ))),
+              ),
               SizedBox(width: 10)
             ],
           ),
@@ -162,13 +173,47 @@ class ImagePickerView extends StatelessWidget {
               imagePickerController.handleScrollEvent(scroll);
               return true;
             },
-            child: GridView.builder(
-                itemCount: imagePickerController.mediaList.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, mainAxisSpacing: 3, crossAxisSpacing: 3),
-                itemBuilder: (BuildContext context, int index) {
-                  return imagePickerController.mediaList[index];
-                }),
+            child: Column(
+              children: [
+                // Selection indicator
+                Obx(() => imagePickerController.selectedImages.isNotEmpty
+                    ? Container(
+                        color: Colors.blue.withValues(alpha: 0.1),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${imagePickerController.selectedImages.length} selected',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Spacer(),
+                            TextButton(
+                              onPressed: () =>
+                                  imagePickerController.clearSelection(),
+                              child: Text(
+                                'Clear All',
+                                style: TextStyle(color: Color(0XFF00ACEE)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SizedBox.shrink()),
+                // Grid view
+                Expanded(
+                  child: GridView.builder(
+                      itemCount: imagePickerController.mediaList.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 3,
+                          crossAxisSpacing: 3),
+                      itemBuilder: (BuildContext context, int index) {
+                        return imagePickerController.mediaList[index];
+                      }),
+                ),
+              ],
+            ),
           ),
         ));
   }
