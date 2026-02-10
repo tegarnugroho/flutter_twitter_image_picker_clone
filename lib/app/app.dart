@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_twitter_image_picker/app/view/image_picker_view.dart';
 import 'package:get/route_manager.dart';
@@ -12,7 +13,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       enableLog: true,
-      home: ImagePickerView(onImagesSelected: onImagesSelected),
+      home: ImagePickerView(
+        onImagesSelected: (images) {
+          if (kDebugMode) {
+            print('Selected images length ${images.length}');
+          }
+          onImagesSelected?.call(images);
+        },
+      ),
       defaultTransition: Transition.fade,
     );
   }

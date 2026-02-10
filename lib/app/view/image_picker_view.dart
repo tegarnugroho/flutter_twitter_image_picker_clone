@@ -120,30 +120,26 @@ class ImagePickerView extends StatelessWidget {
     return Obx(() => Scaffold(
           backgroundColor: Color(0XFF15202B),
           appBar: AppBar(
-            title: SizedBox(
-              width: 180,
-              child: DropdownButtonHideUnderline(
-                child: ButtonTheme(
-                  alignedDropdown: true,
-                  child: DropdownButton(
-                    hint:
-                        Text('Gallery', style: TextStyle(color: Colors.white)),
-                    value: imagePickerController.selectedAlbums,
-                    isExpanded: true,
-                    icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                    dropdownColor: Color(0XFF15202B),
-                    items: imagePickerController.listAlbums.map((value) {
-                      return DropdownMenuItem(
-                        value: value,
-                        child: Text(
-                          value.name,
-                          style: TextStyle(color: Colors.white),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: imagePickerController.onChangedAlbums(),
-                  ),
+            title: DropdownButtonHideUnderline(
+              child: ButtonTheme(
+                alignedDropdown: true,
+                child: DropdownButton(
+                  hint: Text('Gallery', style: TextStyle(color: Colors.white)),
+                  value: imagePickerController.selectedAlbums,
+                  isExpanded: false,
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                  dropdownColor: Color(0XFF15202B),
+                  items: imagePickerController.listAlbums.map((value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        value.name,
+                        style: TextStyle(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: imagePickerController.onChangedAlbums(),
                 ),
               ),
             ),
@@ -155,6 +151,15 @@ class ImagePickerView extends StatelessWidget {
               icon: Icon(Icons.close, color: Color(0XFF00ACEE)),
             ),
             actions: [
+              if (imagePickerController.selectedImages.isNotEmpty)
+                GestureDetector(
+                  onTap: () => imagePickerController.clearSelection(),
+                  child: Text(
+                    'Clear',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              SizedBox(width: 10),
               GestureDetector(
                 onTap: () => imagePickerController.onDonePressed(),
                 child: Obx(() => Center(
@@ -173,46 +178,16 @@ class ImagePickerView extends StatelessWidget {
               imagePickerController.handleScrollEvent(scroll);
               return true;
             },
-            child: Column(
-              children: [
-                // Selection indicator
-                Obx(() => imagePickerController.selectedImages.isNotEmpty
-                    ? Container(
-                        color: Colors.blue.withValues(alpha: 0.1),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
-                          children: [
-                            Text(
-                              '${imagePickerController.selectedImages.length} selected',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Spacer(),
-                            TextButton(
-                              onPressed: () =>
-                                  imagePickerController.clearSelection(),
-                              child: Text(
-                                'Clear All',
-                                style: TextStyle(color: Color(0XFF00ACEE)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SizedBox.shrink()),
-                // Grid view
-                Expanded(
-                  child: GridView.builder(
-                      itemCount: imagePickerController.mediaList.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 3,
-                          crossAxisSpacing: 3),
-                      itemBuilder: (BuildContext context, int index) {
-                        return imagePickerController.mediaList[index];
-                      }),
-                ),
-              ],
+            child: Expanded(
+              child: GridView.builder(
+                  itemCount: imagePickerController.mediaList.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 3,
+                      crossAxisSpacing: 3),
+                  itemBuilder: (BuildContext context, int index) {
+                    return imagePickerController.mediaList[index];
+                  }),
             ),
           ),
         ));
