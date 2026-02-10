@@ -145,10 +145,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Show some love and star the repo to support the project
 
 ## Screenshots
+<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/7550e2d0-6cfe-4c18-9b70-c16f1660eac9" />
 
-<div align="center">
-  <img src="<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/1857986d-39d5-4380-a6cf-a97fb24d072d" />
-" width="400" alt="App Screenshot 1">
-  <img src="<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/24329300-f273-4a50-8d64-67a3acd00772" />
-" width="400" alt="App Screenshot 2">
-</div>
+<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/9bdf7eca-8a49-4fce-a01a-63706cd6be5c" />
+
+<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/07a05e5b-623e-4bfe-a471-c43dd3c919c8" />
+
+
+
