@@ -173,22 +173,63 @@ class ImagePickerView extends StatelessWidget {
               SizedBox(width: 10)
             ],
           ),
-          body: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scroll) {
-              imagePickerController.handleScrollEvent(scroll);
-              return true;
-            },
-            child: Expanded(
-              child: GridView.builder(
-                  itemCount: imagePickerController.mediaList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 3,
-                      crossAxisSpacing: 3),
-                  itemBuilder: (BuildContext context, int index) {
-                    return imagePickerController.mediaList[index];
-                  }),
-            ),
+          body: Column(
+            children: [
+              // Selection indicator
+              Obx(() => imagePickerController.selectedImages.isNotEmpty
+                  ? Container(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      height: 40,
+                      child: Row(
+                        children: [
+                          Text(
+                            '${imagePickerController.selectedImages.length} selected',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                          Spacer(),
+                          SizedBox(
+                            height: 24,
+                            child: TextButton(
+                              onPressed: () =>
+                                  imagePickerController.clearSelection(),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size(0, 24),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                'Clear All',
+                                style: TextStyle(
+                                    color: Color(0XFF00ACEE), fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : SizedBox.shrink()),
+              // Grid view
+              Expanded(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scroll) {
+                    imagePickerController.handleScrollEvent(scroll);
+                    return true;
+                  },
+                  child: GridView.builder(
+                      itemCount: imagePickerController.mediaList.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 3,
+                          crossAxisSpacing: 3),
+                      itemBuilder: (BuildContext context, int index) {
+                        return imagePickerController.mediaList[index];
+                      }),
+                ),
+              ),
+            ],
           ),
         ));
   }

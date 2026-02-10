@@ -145,11 +145,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Show some love and star the repo to support the project
 
 ## Screenshots
-<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/7550e2d0-6cfe-4c18-9b70-c16f1660eac9" />
 
-<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/9bdf7eca-8a49-4fce-a01a-63706cd6be5c" />
-
-<img width="410" height="766" alt="image" src="https://github.com/user-attachments/assets/07a05e5b-623e-4bfe-a471-c43dd3c919c8" />
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img width="300" height="600" alt="Screenshot 1" src="https://github.com/user-attachments/assets/7550e2d0-6cfe-4c18-9b70-c16f1660eac9" />
+      <br>
+      <em>Main Gallery View</em>
+    </td>
+    <td align="center" width="33%">
+      <img width="300" height="600" alt="Screenshot 2" src="https://github.com/user-attachments/assets/9bdf7eca-8a49-4fce-a01a-63706cd6be5c" />
+      <br>
+      <em>Image Selection</em>
+    </td>
+    <td align="center" width="33%">
+      <img width="300" height="600" alt="Screenshot 3" src="https://github.com/user-attachments/assets/07a05e5b-623e-4bfe-a471-c43dd3c919c8" />
+      <br>
+      <em>Image Preview</em>
+    </td>
+  </tr>
+</table>
 
 
 
