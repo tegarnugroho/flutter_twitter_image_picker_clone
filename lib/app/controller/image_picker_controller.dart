@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -5,10 +6,14 @@ import 'package:photo_manager/photo_manager.dart';
 class ImagePickerController extends GetxController {
   var mediaList = <Widget>[].obs;
   var listAlbums = <AssetPathEntity>[].obs;
-  AssetPathEntity selectedAlbums;
-  int lastPage;
+  var selectedImages = <AssetEntity>[].obs;
+  AssetPathEntity? selectedAlbums;
+  int? lastPage;
   int currentPage = 0;
   bool refreshed = false;
+
+  Function(Uint8List?)? onLongPressImage;
+  Function(List<AssetEntity>)? onImagesSelected;
 
   @override
   void onInit() {
@@ -24,55 +29,118 @@ class ImagePickerController extends GetxController {
     }
   }
 
+  void toggleImageSelection(AssetEntity asset) {
+    if (selectedImages.contains(asset)) {
+      selectedImages.remove(asset);
+    } else {
+      selectedImages.add(asset);
+    }
+  }
+
+  bool isImageSelected(AssetEntity asset) {
+    return selectedImages.contains(asset);
+  }
+
+  void clearSelection() {
+    selectedImages.clear();
+  }
+
+  void onDonePressed() {
+    if (onImagesSelected != null && selectedImages.isNotEmpty) {
+      onImagesSelected!(selectedImages.toList());
+    }
+  }
+
   _fetchGallery() async {
     lastPage = currentPage;
-    var result = await PhotoManager.requestPermission();
-    if (result) {
+    var result = await PhotoManager.requestPermissionExtend();
+    if (result.isAuth) {
       listAlbums.value = await PhotoManager.getAssetPathList(onlyAll: false);
-      if (selectedAlbums == null) {
-        selectedAlbums = listAlbums.first;
+      if (listAlbums.isEmpty) {
+        return; // No albums available
       }
+      selectedAlbums ??= listAlbums.first;
       List<AssetEntity> media =
-          await selectedAlbums.getAssetListPaged(currentPage, 60);
-      print(media);
-      print(listAlbums.length);
+          await selectedAlbums!.getAssetListPaged(page: currentPage, size: 60);
+      media = media.reversed.toList();
+      if (kDebugMode) {
+        print(media);
+        print(listAlbums.length);
+      }
       List<Widget> temp = [];
       for (var asset in media) {
         temp.add(
-          FutureBuilder(
-            future: asset.thumbDataWithSize(200, 200),
-            builder: (BuildContext context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done)
-                return Stack(
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: Image.memory(
-                        snapshot.data,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text(
-                            'error',
-                            style: TextStyle(color: Colors.white),
-                          );
-                        },
+          Obx(() => GestureDetector(
+            onTap: () => toggleImageSelection(asset),
+            onLongPress: () async {
+              // Get the full image data for preview
+              final data = await asset.originBytes;
+              onLongPressImage?.call(data);
+            },
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: FutureBuilder(
+                    future: asset.thumbnailDataWithOption(
+                        ThumbnailOption(size: ThumbnailSize(200, 200))),
+                    builder: (BuildContext context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return Image.memory(
+                          snapshot.data!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Text(
+                              'error',
+                              style: TextStyle(color: Colors.white),
+                            );
+                          },
+                        );
+                      }
+                      return Container();
+                    },
+                  ),
+                ),
+                if (asset.type == AssetType.video)
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 5, bottom: 5),
+                      child: Icon(
+                        Icons.videocam,
+                        color: Colors.white,
                       ),
                     ),
-                    if (asset.type == AssetType.video)
-                      Align(
-                        alignment: Alignment.bottomRight,
+                  ),
+                // Selection overlay
+                if (isImageSelected(asset))
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.blue.withValues(alpha: 0.3),
+                      child: Align(
+                        alignment: Alignment.topRight,
                         child: Padding(
-                          padding: EdgeInsets.only(right: 5, bottom: 5),
-                          child: Icon(
-                            Icons.videocam,
-                            color: Colors.white,
+                          padding: EdgeInsets.all(8),
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            ),
                           ),
                         ),
                       ),
-                  ],
-                );
-              return Container();
-            },
-          ),
+                    ),
+                  ),
+              ],
+            ),
+          )),
         );
       }
       if (refreshed) {
@@ -89,7 +157,7 @@ class ImagePickerController extends GetxController {
       mediaList.addAll(temp);
       currentPage++;
     } else {
-      /// user doesn't give permission 
+      /// user doesn't give permission
     }
   }
 
@@ -98,12 +166,8 @@ class ImagePickerController extends GetxController {
       selectedAlbums = value;
       refreshed = true;
       currentPage = 0;
+      clearSelection(); // Clear selection when switching albums
       _fetchGallery();
     };
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }
